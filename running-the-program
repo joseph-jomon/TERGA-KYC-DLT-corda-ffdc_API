@@ -1,0 +1,11 @@
+gradlew clean deployNodes //to build, make sure you import packages correctly,especially your state to your flow
+
+call build/nodes/runnodes.bat // to start running the nodes or run jar file ,run as administrator
+
+add a kyc by adding data to a state and initiating a transaction ,code on line 6
+ start KycFlow kname: "Alice", kaddress: "Longmarket Street, Alice, Eastern Cape", kdob: "26/05/1998", kemail: "aliceinwondlnd@gmail.com", otherParty: "O=Bank-A,L=New York,C=US" 
+
+
+run vaultQuery contractStateType: com.template.states.KycState  // to see the state in the vault
+   
+run networkMapSnapshot  // to see nodes
