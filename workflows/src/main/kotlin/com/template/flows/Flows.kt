@@ -2,13 +2,15 @@ package com.template.flows
 import  com.template.states.KycState
 
 import co.paralleluniverse.fibers.Suspendable
+import com.template.contracts.KycContract
 import net.corda.core.flows.*
 import net.corda.core.utilities.ProgressTracker
 import net.corda.core.contracts.Command
 import net.corda.core.identity.Party
 import net.corda.core.transactions.TransactionBuilder
-import com.template.contracts.TemplateContract
+
 import net.corda.core.contracts.BelongsToContract
+import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.AbstractParty
 
@@ -23,7 +25,7 @@ import net.corda.core.identity.AbstractParty
 // *********
 @InitiatingFlow
 @StartableByRPC
-class KycFlow(val kname: String ,val kaddress: String,val kdob: String,val kemail: String, val otherParty: Party ) : FlowLogic<Unit>() {
+class KycFlow(val kname: String = "not_shared",val kaddress: String = "not_shared",val kdob: String = "not_shared",val kemail: String = "not_shared", val otherParty: Party,val Type: CommandData ) : FlowLogic<Unit>() {
 
 
     override val progressTracker = ProgressTracker()
@@ -34,11 +36,11 @@ class KycFlow(val kname: String ,val kaddress: String,val kdob: String,val kemai
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
         // We create the transaction components.
         val outputState = KycState(kname,kaddress,kdob,kemail, ourIdentity, otherParty)
-        val command = Command(TemplateContract.Commands.Action(), ourIdentity.owningKey)
+        val command = Command(Type, ourIdentity.owningKey)
 
         // We create a transaction builder and add the components.
         val txBuilder = TransactionBuilder(notary = notary)
-                .addOutputState(outputState, TemplateContract.ID)
+                .addOutputState(outputState, KycContract.ID)
                 .addCommand(command)
         // We sign the transaction.
         val signedTx = serviceHub.signInitialTransaction(txBuilder)
@@ -58,5 +60,6 @@ class KycFlowResponder(  val otherPartySession: FlowSession) : FlowLogic<Unit>()
     override fun call() {
         // Responder flow logic goes here.
         subFlow(ReceiveFinalityFlow(otherPartySession))
+
     }
 }
