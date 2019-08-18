@@ -53,15 +53,19 @@ class KycContract : Contract {
 
         //********************************************************
         fun verifyKycUpdate(tx: LedgerTransaction) = requireThat {
+
             // Constraints on the shape of the transaction.
+            val input = tx.inputsOfType<KycState>().single()
             "A Kyc update transaction should only consume one input state." using (tx.inputs.size == 1)
             "There should be one output state of type KycState." using (tx.outputs.size == 1)
+            //val ourOtherOutputState: KycState = ourOutputState.copy(magicNumber = 77)
 
-            // IOU-specific constraints.
+            // Kyc-specific constraints.
             val output = tx.outputsOfType<KycState>().single()
             "The owner and the bank cannot be the same entity." using (output.owner != output.bank)
 
             // Constraints on the signers.
+
             val expectedSigners = listOf(output.owner.owningKey, output.bank.owningKey)
             "There must be two signers." using (command.signers.toSet().size == 2)
             "The owner and bank must be signers." using (command.signers.containsAll(expectedSigners))
