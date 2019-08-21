@@ -9,6 +9,9 @@ import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.startTrackedFlow
 import net.corda.core.messaging.vaultQueryBy
+import net.corda.core.node.services.Vault
+import net.corda.core.node.services.vault.QueryCriteria
+import net.corda.core.node.services.vault.QueryCriteria.VaultQueryCriteria
 import net.corda.core.utilities.getOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -138,6 +141,12 @@ class Controller(rpc: NodeRPCConnection) {
         val mykyc = proxy.vaultQueryBy<KycState>().states.filter { it.state.data.owner.equals(proxy.nodeInfo().legalIdentities.first()) }
         return ResponseEntity.ok(mykyc)
     }
-
+    //*******************************************************************************************************************************************************************************************
+    @GetMapping(value = [ "myallkyc"], produces = [ APPLICATION_JSON_VALUE ])
+    fun getMyallkycs(): ResponseEntity<Vault.Page<KycState>>? {
+        val linearStateCriteria = QueryCriteria.LinearStateQueryCriteria( status = Vault.StateStatus.ALL)
+        val vaultCriteria = VaultQueryCriteria(status = Vault.StateStatus.ALL)
+        val results = proxy.vaultQueryBy<KycState>(linearStateCriteria and vaultCriteria)
+        return ResponseEntity.ok(results)  }
 
 }
