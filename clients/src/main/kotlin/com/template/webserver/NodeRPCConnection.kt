@@ -15,9 +15,10 @@ private const val CORDA_NODE_HOST = "config.rpc.host"
 private const val CORDA_RPC_PORT = "config.rpc.port"
 
 /**
- * Wraps an RPC connection to a Corda node.
+ * Wraps a node RPC proxy.
  *
- * The RPC connection is configured using command line arguments.
+ * The RPC proxy is configured based on the properties in `application.properties`.
+ *
  *
  * @param host The host of the node we are connecting to.
  * @param rpcPort The RPC port of the node we are connecting to.

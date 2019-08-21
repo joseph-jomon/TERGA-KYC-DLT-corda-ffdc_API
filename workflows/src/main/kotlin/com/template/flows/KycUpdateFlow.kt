@@ -5,18 +5,16 @@ package com.template.flows
 import co.paralleluniverse.fibers.Suspendable
 import com.template.contracts.KycContract
 import com.template.states.KycState
-import net.corda.core.contracts.*
-import net.corda.core.crypto.SecureHash
+import net.corda.core.contracts.Command
+import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
-import net.corda.core.flows.SendTransactionFlow
-import net.corda.core.node.StatesToRecord
-import net.corda.core.node.services.Vault.Page
-import net.corda.core.node.services.queryBy
-import net.corda.core.node.services.vault.QueryCriteria
 
 
 // *********
@@ -24,17 +22,17 @@ import net.corda.core.node.services.vault.QueryCriteria
 // *********
 @InitiatingFlow
 @StartableByRPC
-class KycUpdateFlow(val kname: String = "not_shared",val kaddress: String = "not_shared",val kdob: String = "not_shared",val kemail: String = "not_shared", val otherParty: Party,val KycId : UniqueIdentifier) : FlowLogic<Unit>() {
+class KycUpdateFlow(val kname: String = "not_shared",val kaddress: String = "not_shared",val kdob: String = "not_shared",val kemail: String = "not_shared", val otherParty: Party,val KycId : UniqueIdentifier) : FlowLogic<SignedTransaction>() {
 
 
     override val progressTracker = ProgressTracker()
 
     @Suspendable
-    override fun call() {
+    override fun call():SignedTransaction {
         // We retrieve the notary identity from the network map.
         val notary = serviceHub.networkMapCache.notaryIdentities[0]
         // We create the transaction components.
-        val outputState = KycState(kname,kaddress,kdob,kemail, ourIdentity, otherParty)
+        val outputState = KycState(kname,kaddress,kdob,kemail, ourIdentity, otherParty,KycId)
 
 
             val command = Command(KycContract.Commands.UpdateKyc(), listOf(ourIdentity.owningKey, otherParty.owningKey))
@@ -88,7 +86,7 @@ class KycUpdateFlow(val kname: String = "not_shared",val kaddress: String = "not
             val fullySignedTx = subFlow(CollectSignaturesFlow(signedTx, listOf(otherPartySession), CollectSignaturesFlow.tracker()))
 
             // We finalise the transaction and then send it to the counterparty.
-            subFlow(FinalityFlow(fullySignedTx, otherPartySession))
+        return subFlow(FinalityFlow(fullySignedTx, otherPartySession))
 
 
 
@@ -98,9 +96,9 @@ class KycUpdateFlow(val kname: String = "not_shared",val kaddress: String = "not
 }
 
 @InitiatedBy(KycUpdateFlow::class)
- class KycUpdateFlowResponder(  internal val otherPartySession: FlowSession) : FlowLogic<Unit>() {
+ class KycUpdateFlowResponder(  internal val otherPartySession: FlowSession) : FlowLogic<SignedTransaction>() {
     @Suspendable
-    override fun call() {
+    override fun call(): SignedTransaction {
         // Responder flow logic goes here.
         val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
@@ -113,7 +111,8 @@ class KycUpdateFlow(val kname: String = "not_shared",val kaddress: String = "not
 
         //subFlow(ReceiveTransactionFlow(otherPartySession, true, StatesToRecord.ONLY_RELEVANT))
         val TxId = subFlow(signTransactionFlow).id
-        subFlow(ReceiveFinalityFlow(otherPartySession,TxId))
+        logger.info("KycUpdateFlowResponder =="+TxId)
+        return subFlow(ReceiveFinalityFlow(otherPartySession,TxId))
 
     }
 }
