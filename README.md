@@ -24,8 +24,11 @@ See https://docs.corda.net/getting-set-up.html.
 /api/template/create-kyc
 
 /api/template/myallkyc
+
 /api/template/my-kycs
+
 /api/template/update-kyc
+
 /api/template/kyc-in-vault
 
 
