@@ -6,7 +6,7 @@
 
 Welcome to the Kotlin CorDapp for KYC.
 
-**This is the Kotlin version of the CorDapp template. **
+**This is the Kotlin version of the CorDapp . **
 
 # Pre-Requisites
 
