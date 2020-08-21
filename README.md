@@ -1,20 +1,44 @@
 <p align="center">
-  <img src="https://www.corda.net/wp-content/uploads/2016/11/fg005_corda_b.png" alt="Corda" width="500">
+  <img src="https://static.wixstatic.com/media/16152b_a02ca3a053bb459281daff0d94fe882f~mv2.jpg/v1/fill/w_573,h_543,al_c,q_80,usm_0.66_1.00_0.01/16152b_a02ca3a053bb459281daff0d94fe882f~mv2.webp" alt="DLT" width="500">
 </p>
 
-# CorDapp Template - Kotlin
+# CorDapp KYC - Kotlin
 
-Welcome to the Kotlin CorDapp template. The CorDapp template is a stubbed-out CorDapp that you can use to bootstrap 
-your own CorDapps.
+Welcome to the Kotlin CorDapp for KYC.
 
-**This is the Kotlin version of the CorDapp template. The Java equivalent is 
-[here](https://github.com/corda/cordapp-template-java/).**
+**This is the Kotlin version of the CorDapp template. **
 
 # Pre-Requisites
 
 See https://docs.corda.net/getting-set-up.html.
 
 # Usage
+
+# Build the project
+1) gradlew clean deployNodes  
+# Run the batch files
+ 2) call build/nodes/runnodes.bat
+# Run Template Server
+ 3) gradlew.bat runTemplateServer
+# Run postman,connect to the server and use below endpoints to communicate with your KYC cordapp
+/api/template/create-kyc
+
+/api/template/myallkyc
+/api/template/my-kycs
+/api/template/update-kyc
+/api/template/kyc-in-vault
+
+
+
+
+
+
+
+# Example to issue a flow from postman
+
+ ** start KycIssueFlow kname: "Alice-again", kaddress: "Longmarket Street, Alice, Eastern Cape", kdob: "26/05/1998", kemail: "aliceinwondlnd@gmail.com", otherParty: "O=Bank-A,L=New York,C=US"**
+
+run networkMapSnapshot
 
 ## Running tests inside IntelliJ
 
